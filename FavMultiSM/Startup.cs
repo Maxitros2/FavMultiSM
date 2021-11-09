@@ -60,11 +60,12 @@ namespace FavMultiSM
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "FavMultiSM", Version = "v1" });
-            });          
+            });
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, TelegramBot telegramBot)
         {
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
@@ -89,6 +90,7 @@ namespace FavMultiSM
             {
                 endpoints.MapControllers();
             });
+            telegramBot.GetBotClientAsync();
         }
     }
 }

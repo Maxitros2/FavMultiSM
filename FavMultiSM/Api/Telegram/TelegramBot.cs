@@ -17,11 +17,10 @@ namespace FavMultiSM.Api.Telegram
 
         public TelegramBot(IConfiguration configuration)
         {
-            Configuration = configuration;
-            GetBotClientAsync();
+            Configuration = configuration;            
         }
 
-        IConfiguration Configuration { get; }
+        IConfiguration Configuration { get; }        
 
         public async Task<TelegramBotClient> GetBotClientAsync()
         {

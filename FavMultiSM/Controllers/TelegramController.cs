@@ -16,7 +16,7 @@ namespace FavMultiSM.Controllers
         public TelegramController(MessageProceeder messageProceeder, TelegramBot telegramBot)
         {
             MessageProceeder = messageProceeder;
-            TelegramBot = telegramBot;
+            TelegramBot = telegramBot;            
         }
 
         MessageProceeder MessageProceeder { get; }
