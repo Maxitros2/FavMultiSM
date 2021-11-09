@@ -79,7 +79,7 @@ namespace FavMultiSM
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "FavMultiSM v1"));
             }
 
-            app.UseHttpsRedirection();
+           
 
             app.UseRouting();
 
