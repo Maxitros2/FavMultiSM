@@ -38,6 +38,7 @@ namespace FavMultiSM.Api.Users.Security
             var record = new Challenge() { ExpirationTime = DateTime.Now.AddMinutes(10), UserId = userId };
             record.Code = generateToken().ToString();
             await AppContext.Challenges.AddAsync(record);
+            await AppContext.SaveChangesAsync();
             return record.Code;
         }
         int generateToken()
