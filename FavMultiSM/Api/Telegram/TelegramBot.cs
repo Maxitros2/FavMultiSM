@@ -29,7 +29,7 @@ namespace FavMultiSM.Api.Telegram
                 return botClient;
             }
             botClient = new TelegramBotClient(Configuration["telegram:token"]);
-            string hook = string.Format(Configuration["telegram:url"], "api/tg/callback");
+            string hook = Configuration["telegram:url"] + "api/tg/callback";
             await botClient.SetWebhookAsync(hook);            
             return botClient;
         }

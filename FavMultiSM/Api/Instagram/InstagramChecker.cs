@@ -43,8 +43,8 @@ namespace FavMultiSM.Api.Instagram
                 if (InstagramApi.HasCode && !InstagramApi.IsBusy)
                 {                    
                     var pendingDirect = await instaApi.MessagingProcessor.GetDirectInboxAsync(PaginationParameters.MaxPagesToLoad(1));
-                    //if(pendingDirect.Value.Inbox.Threads!=null)
-                      //  await ProceedMessages(pendingDirect.Value.Inbox.Threads);
+                    if(pendingDirect.Value.Inbox.Threads!=null)
+                        await ProceedMessages(pendingDirect.Value.Inbox.Threads);
                 }
                 await Task.Delay(10000, stoppingToken);
             }
