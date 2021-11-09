@@ -4,6 +4,7 @@ using FavMultiSM.Models.ApiModels;
 using FavMultiSM.Registration;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using VkNet.Model;
@@ -34,6 +35,20 @@ namespace FavMultiSM.Api.Users
                 if(data.HasSocial(social))
                 {
                     await SenderDictionary[social].SendMessage(message, data);
+                }
+                if(message.Attachments != null && data.CurrentSocial==SocialEnum.Telegram)
+                {
+                    foreach(var atach in message.Attachments)
+                    {
+                        try
+                        {
+                            File.Delete(atach);
+                        }
+                        catch
+                        {
+
+                        }
+                    }
                 }
             }
             return true;
