@@ -44,7 +44,7 @@ namespace FavMultiSM.Api.Socials
                         {
                             if (send.Info.ResponseType == ResponseType.ChallengeRequired)
                             {
-                                var challengeData = await (await InstagramApi.GetInstaApi()).GetLoggedInChallengeDataInfoAsync();                    
+                                var challengeData = await (await InstagramApi.GetInstaApi()).GetLoggedInChallengeDataInfoAsync();                  
 
                                 var acceptChallenge = await (await InstagramApi.GetInstaApi()).AcceptChallengeAsync();
                                 var send2 = await(await InstagramApi.GetInstaApi()).MessagingProcessor.SendDirectDisappearingPhotoAsync(new InstaImage() { Uri = filepath, Width = 591, Height = 1280  }, InstagramApiSharp.Enums.InstaViewMode.Permanent, data.InstagramId);
