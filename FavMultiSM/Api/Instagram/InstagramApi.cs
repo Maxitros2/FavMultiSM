@@ -132,7 +132,13 @@ namespace FavMultiSM.Api.Instagram
                     }
                 }
                 HasCode = true;
-                IsBusy = false;                
+                IsBusy = false;
+                var CurrentUserIdWait = await instaApi.GetCurrentUserAsync();
+                while (!CurrentUserIdWait.Succeeded)
+                {
+                    await Task.Delay(100);
+                }
+                CurrentUserId = CurrentUserIdWait.Value.Pk;
                 return instaApi;
             }
             return instaApi;
