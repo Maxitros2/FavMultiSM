@@ -6,6 +6,7 @@ using InstagramApiSharp.Classes.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace FavMultiSM.Api.Socials
@@ -25,9 +26,9 @@ namespace FavMultiSM.Api.Socials
             {
                 if (!String.IsNullOrEmpty(message.Text))
                     await (await InstagramApi.GetInstaApi()).MessagingProcessor.SendDirectTextAsync(data.InstagramId, null, message.Text);
-                if(message.Attachments!=null)
+                if (message.Attachments != null)
                     foreach (var media in message.Attachments)
-                        await (await InstagramApi.GetInstaApi()).MessagingProcessor.SendDirectPhotoToRecipientsAsync(new InstaImage() { Uri = media }, data.InstagramId);
+                        await (await InstagramApi.GetInstaApi()).MessagingProcessor.SendDirectPhotoToRecipientsAsync(new InstaImage() { ImageBytes = await new WebClient().DownloadDataTaskAsync(new Uri(media)) }, data.InstagramId) ;
             }
             return true;
         }
