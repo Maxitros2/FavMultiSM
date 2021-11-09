@@ -29,9 +29,9 @@ namespace FavMultiSM.Api.Socials
             if (message.Text != null)
                 vkMessage.Message = message.Text;
             else
-                vkMessage.Message = "";
-            if (message.Attachments != null)
-                vkMessage.Attachments = message.Attachments.Select(x => new Photo() { PhotoSrc = new Uri(x) });
+                vkMessage.Message = " ";
+            //if (message.Attachments != null)
+              //  vkMessage.Attachments = message.Attachments.Select(x => new Photo() { PhotoSrc = new Uri(x) });
             await VkApi.Messages.SendAsync(vkMessage);
             return true;
         }
