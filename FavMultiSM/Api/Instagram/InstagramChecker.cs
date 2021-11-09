@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -43,7 +44,7 @@ namespace FavMultiSM.Api.Instagram
                 if (InstagramApi.HasCode && !InstagramApi.IsBusy)
                 {                    
                     var pendingDirect = await instaApi.MessagingProcessor.GetDirectInboxAsync(PaginationParameters.MaxPagesToLoad(1));
-                    if(pendingDirect.Value.Inbox.Threads!=null)
+                    if(pendingDirect.Value!=null && pendingDirect.Value.Inbox.Threads!=null)
                         await ProceedMessages(pendingDirect.Value.Inbox.Threads);
                 }
                 await Task.Delay(10000, stoppingToken);
@@ -67,24 +68,28 @@ namespace FavMultiSM.Api.Instagram
                             case InstaDirectThreadItemType.Text:
                                 sendMessage = new Models.ApiModels.ReSendMessage() { Text = message.Text }; break;
                             case InstaDirectThreadItemType.Media:
-                                sendMessage = new Models.ApiModels.ReSendMessage() { Attachments = message.Media.Images.Select(x => new StringBuilder(x.Uri).ToString()) }; break;
+                                sendMessage = new Models.ApiModels.ReSendMessage() { Attachments = message.Media.Images.Where(x=>!Regex.Match(x.Uri, "[p,s][0-9]{1,}[x][0-9]{1,}").Success).Select(x => new StringBuilder(x.Uri).ToString()) }; break;
                             case InstaDirectThreadItemType.MediaShare:
                                 sendMessage = new Models.ApiModels.ReSendMessage() { Attachments = message.MediaShare.Images.Select(x => new StringBuilder(x.Uri).ToString()) }; break;
                         }
                         if (sendMessage != null)
                         {
+                            if (sendMessage.Text == null)
+                                sendMessage.Text = "";
                             using (var scope = Services.CreateScope())
                             {
                                 var messageProceeder =
                                     scope.ServiceProvider
                                         .GetRequiredService<MessageProceeder>();
 
-                                await messageProceeder.ProceedInstagramMessage(sendMessage, message.UserId.ToString());
+                                await messageProceeder.ProceedInstagramMessage(sendMessage, thread.ThreadId);
                             }
                         }
+                        await (await InstagramApi.GetInstaApi()).MessagingProcessor.MarkDirectThreadAsSeenAsync(thread.ThreadId, message.ItemId);
+                        await (await InstagramApi.GetInstaApi()).MessagingProcessor.DeleteSelfMessageAsync(thread.ThreadId, message.ItemId);
                     }                    
                 }
-                await(await InstagramApi.GetInstaApi()).MessagingProcessor.DeleteDirectThreadAsync(thread.ThreadId);
+               
             }
             return true;
         }

@@ -1,4 +1,5 @@
 ﻿using FavMultiSM.Registration;
+using InstagramApiSharp;
 using InstagramApiSharp.API;
 using InstagramApiSharp.API.Builder;
 using InstagramApiSharp.Classes;
@@ -41,7 +42,7 @@ namespace FavMultiSM.Api.Instagram
                 .SetUser(userSession)
                 .UseLogger(instLogger)
                 .Build();
-            LoadSession();
+            LoadSession();            
             if (!instaApi.IsUserAuthenticated)
             {
                 var logInResult = await instaApi.LoginAsync();
@@ -49,7 +50,9 @@ namespace FavMultiSM.Api.Instagram
                 HasCode = false;
                 if (logInResult.Succeeded)
                 {
-                    SaveSession();
+                    var challengeData = await instaApi.GetLoggedInChallengeDataInfoAsync();
+                    var acceptChallenge = await instaApi.AcceptChallengeAsync();
+                    SaveSession();                    
                     HasCode = true;
                 }
                 else
@@ -117,8 +120,19 @@ namespace FavMultiSM.Api.Instagram
             }
             else
             {
+                var x = await instaApi.FeedProcessor.GetExploreFeedAsync(PaginationParameters.MaxPagesToLoad(1));
+                if (x.Succeeded == false)
+                {
+                    if (x.Info.ResponseType == ResponseType.UnExpectedResponse)
+                    {
+                        var challengeData = await instaApi.GetLoggedInChallengeDataInfoAsync();
+                        
+                        var acceptChallenge = await instaApi.AcceptChallengeAsync();
+                        // If Succeeded was TRUE, you can continue to your work! 
+                    }
+                }
                 HasCode = true;
-                IsBusy = false;
+                IsBusy = false;                
                 return instaApi;
             }
             return instaApi;
@@ -139,7 +153,7 @@ namespace FavMultiSM.Api.Instagram
                         // _instaApi.LoadStateDataFromString(new StreamReader(fs).ReadToEnd());
                         // you should pass json string as parameter to this function.
                     }
-                }
+                }                
             }
             catch (Exception e)
             {

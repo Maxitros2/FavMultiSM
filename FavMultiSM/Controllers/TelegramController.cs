@@ -38,7 +38,8 @@ namespace FavMultiSM.Controllers
                 case Telegram.Bot.Types.Enums.MessageType.Photo: 
                     resendMsg.Text = message.Text;
                     var stream = (await (await TelegramBot.GetBotClientAsync()).GetFileAsync(message.Photo.Last().FileId)).FilePath;                                          
-                    resendMsg.Attachments = new List<string>() { "https://api.telegram.org/file/bot"+Configuration["telegram:token"] +"/"+ stream }; break;
+                    resendMsg.Attachments = new List<string>() { "https://api.telegram.org/file/bot"+Configuration["telegram:token"] +"/"+ stream }; 
+                    break;
             }
             if(message.Text == null)
             {
