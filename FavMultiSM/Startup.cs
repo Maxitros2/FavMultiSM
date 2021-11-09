@@ -1,11 +1,13 @@
 using FavMultiSM.Api.Instagram;
 using FavMultiSM.Api.Socials;
+using FavMultiSM.Api.Telegram;
 using FavMultiSM.Api.Users;
 using FavMultiSM.Api.Users.Security;
 using FavMultiSM.Models;
 using FavMultiSM.Registration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -58,12 +60,18 @@ namespace FavMultiSM
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "FavMultiSM", Version = "v1" });
-            });
+            });          
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+
+            app.UseAuthentication();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

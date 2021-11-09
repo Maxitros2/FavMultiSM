@@ -18,6 +18,7 @@ namespace FavMultiSM.Api.Telegram
         public TelegramBot(IConfiguration configuration)
         {
             Configuration = configuration;
+            GetBotClientAsync();
         }
 
         IConfiguration Configuration { get; }
