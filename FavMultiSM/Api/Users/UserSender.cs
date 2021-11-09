@@ -35,21 +35,7 @@ namespace FavMultiSM.Api.Users
                 if(data.HasSocial(social))
                 {
                     await SenderDictionary[social].SendMessage(message, data);
-                }
-                if(message.Attachments != null && data.CurrentSocial==SocialEnum.Telegram)
-                {
-                    foreach(var atach in message.Attachments)
-                    {
-                        try
-                        {
-                            File.Delete(atach);
-                        }
-                        catch
-                        {
-
-                        }
-                    }
-                }
+                }               
             }
             return true;
         }  

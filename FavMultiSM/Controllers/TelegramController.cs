@@ -2,6 +2,7 @@
 using FavMultiSM.Api.Users;
 using FavMultiSM.Models.ApiModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,14 +15,16 @@ namespace FavMultiSM.Controllers
     [Route("api/tg/callback")]
     public class TelegramController : ControllerBase, IReciver
     {
-        public TelegramController(MessageProceeder messageProceeder, TelegramBot telegramBot)
+        public TelegramController(MessageProceeder messageProceeder, TelegramBot telegramBot, IConfiguration configuration)
         {
             MessageProceeder = messageProceeder;
-            TelegramBot = telegramBot;            
+            TelegramBot = telegramBot;
+            Configuration = configuration;
         }
 
         MessageProceeder MessageProceeder { get; }
         TelegramBot TelegramBot { get; }
+        IConfiguration Configuration { get; }
 
         [HttpPost]
         public async Task<OkResult> Post([FromBody] Update update)
@@ -34,12 +37,8 @@ namespace FavMultiSM.Controllers
                 case Telegram.Bot.Types.Enums.MessageType.Text: resendMsg.Text = message.Text;  break;
                 case Telegram.Bot.Types.Enums.MessageType.Photo: 
                     resendMsg.Text = message.Text;
-                    var stream = await (await TelegramBot.GetBotClientAsync()).GetFileAsync(message.Photo.Last().FileId);
-                    using (var saveImageStream = new FileStream(stream.FilePath, FileMode.Create))
-                    {
-                        await(await TelegramBot.GetBotClientAsync()).DownloadFileAsync(stream.FilePath, saveImageStream);
-                    }                              
-                    resendMsg.Attachments = new List<string>() { stream.FilePath }; break;
+                    var stream = (await (await TelegramBot.GetBotClientAsync()).GetFileAsync(message.Photo.Last().FileId)).FilePath;                                          
+                    resendMsg.Attachments = new List<string>() { "https://api.telegram.org/file/bot"+Configuration["telegram:token"] +"/"+ stream }; break;
             }
             if(message.Text == null)
             {
