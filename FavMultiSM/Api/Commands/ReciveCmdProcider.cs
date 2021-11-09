@@ -23,7 +23,7 @@ namespace FavMultiSM.Api.Commands
 
         public async override Task<CommandResult> ProcideCmd(ReSendMessage message, UserAccountData user)
         {
-            long? userId = await Manager.CheckChellange(message.Text, GetDataByUser(user), user, user.CurrentSocial);
+            long? userId = await Manager.CheckChellange(message.Text.Split(' ')[1], GetDataByUser(user), user, user.CurrentSocial);
             if (userId != null)
             {
 

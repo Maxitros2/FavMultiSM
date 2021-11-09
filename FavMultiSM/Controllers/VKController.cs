@@ -46,6 +46,8 @@ namespace FavMultiSM.Controllers
                     }
                     resendMsg.Attachments = convertedAttachments;                   
                 }
+                if (msg.Text == null)
+                    resendMsg.Text = "";
                 await MessageProceeder.ProceedVkMessage(resendMsg, msg.PeerId.ToString());
             }
             if (incomeMessage.Type == "confirmation")
