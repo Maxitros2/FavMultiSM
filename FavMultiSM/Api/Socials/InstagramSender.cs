@@ -37,20 +37,20 @@ namespace FavMultiSM.Api.Socials
                     string path = HostEnvironment.ContentRootPath;
                     foreach (var media in message.Attachments)
                     {
-                        string filepath = Path.Combine(path, media.Split("/").Last());                        
-                        await new WebClient().DownloadFileTaskAsync(new Uri(media), filepath);                        
-                        var send = await (await InstagramApi.GetInstaApi()).MessagingProcessor.SendDirectDisappearingPhotoAsync(new InstaImage() { Uri = filepath, Width = 591, Height = 1280 }, InstagramApiSharp.Enums.InstaViewMode.Permanent, data.InstagramId);                        
-                        if (send.Succeeded == false)
+                        switch (media.Type)
                         {
-                            if (send.Info.ResponseType == ResponseType.ChallengeRequired)
-                            {
-                                var challengeData = await (await InstagramApi.GetInstaApi()).GetLoggedInChallengeDataInfoAsync();                  
-
-                                var acceptChallenge = await (await InstagramApi.GetInstaApi()).AcceptChallengeAsync();
-                                var send2 = await(await InstagramApi.GetInstaApi()).MessagingProcessor.SendDirectDisappearingPhotoAsync(new InstaImage() { Uri = filepath, Width = 591, Height = 1280  }, InstagramApiSharp.Enums.InstaViewMode.Permanent, data.InstagramId);
-                            }
+                            case AttachmentType.LocalPhoto:
+                                await (await InstagramApi.GetInstaApi()).MessagingProcessor.SendDirectDisappearingPhotoAsync(new InstaImage() { Uri = media.Url }, InstagramApiSharp.Enums.InstaViewMode.Permanent, data.InstagramId);
+                                
+                                break;
+                            case AttachmentType.WebPhoto:
+                                string filepath = Path.Combine(path, media.Url.Split("/").Last());
+                                await new WebClient().DownloadFileTaskAsync(new Uri(media.Url), filepath);
+                                await (await InstagramApi.GetInstaApi()).MessagingProcessor.SendDirectDisappearingPhotoAsync(new InstaImage() { Uri = filepath }, InstagramApiSharp.Enums.InstaViewMode.Permanent, data.InstagramId);                                
+                                File.Delete(filepath);
+                                break;
                         }
-                        File.Delete(filepath);
+                        
                     }
                 }
             }

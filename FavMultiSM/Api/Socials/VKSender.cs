@@ -3,6 +3,7 @@ using FavMultiSM.Models.ApiModels;
 using FavMultiSM.Registration;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -35,17 +36,31 @@ namespace FavMultiSM.Api.Socials
             else
                 vkMessage.Message = " ";
             if (message.Attachments != null)
-            {
+            {                
                 var uploadServer = await VkApi.Photo.GetMessagesUploadServerAsync(Convert.ToInt64(data.VKId));
                 var attachmentsList = new List<MediaAttachment>();
-                foreach (var photo in message.Attachments)
+                foreach (var attachment in message.Attachments)
                 {
-                    var response = await UploadFile(uploadServer.UploadUrl, photo, photo.Split(".").Last());
-                    var attachment =  await VkApi.Photo.SaveMessagesPhotoAsync(response);
-                    attachmentsList.Add(attachment.First());
+                    switch (attachment.Type)
+                    {
+                        case AttachmentType.LocalPhoto:
+                            {
+                                var response = await UploadFile(uploadServer.UploadUrl, attachment.Url, ".jpeg", false);
+                                var vkAttachment = await VkApi.Photo.SaveMessagesPhotoAsync(response);
+                                attachmentsList.Add(vkAttachment.First());                                
+                            }
+                            break;
+                        case AttachmentType.WebPhoto:
+                            {
+                                var response = await UploadFile(uploadServer.UploadUrl, attachment.Url, ".jpg", true);
+                                var vkAttachment = await VkApi.Photo.SaveMessagesPhotoAsync(response);
+                                attachmentsList.Add(vkAttachment.First());
+                            }
+                            break;
+                    }                    
                 }
                 vkMessage.Attachments = attachmentsList;
-            }             
+            }
             await VkApi.Messages.SendAsync(vkMessage);
             return true;
         }
@@ -54,17 +69,21 @@ namespace FavMultiSM.Api.Socials
         {
             throw new NotImplementedException();
         }
-        private async Task<byte[]> GetBytes(string fileUrl)
+        private async Task<byte[]> GetBytesExternal(string fileUrl)
         {
             using (var webClient = new WebClient())
             {
                 return await webClient.DownloadDataTaskAsync(fileUrl);
             }
         }
-        private async Task<string> UploadFile(string serverUrl, string file, string fileExtension)
+        private async Task<byte[]> GetBytes(string filePath)
+        {
+            return await File.ReadAllBytesAsync(filePath);
+        }
+        private async Task<string> UploadFile(string serverUrl, string file, string fileExtension, bool isExternal)
         {
             // Получение массива байтов из файла
-            var data = await GetBytes(file);
+            var data = isExternal?await GetBytesExternal(file):await GetBytes(file);
 
             // Создание запроса на загрузку файла на сервер
             using (var client = new HttpClient())

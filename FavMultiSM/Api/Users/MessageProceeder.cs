@@ -1,4 +1,5 @@
 ﻿using FavMultiSM.Api.Commands;
+using FavMultiSM.Api.NSFW_Corrector;
 using FavMultiSM.Models;
 using FavMultiSM.Models.ApiModels;
 using FavMultiSM.Registration;
@@ -12,12 +13,15 @@ namespace FavMultiSM.Api.Users
 {
     public class MessageProceeder : ITrancientService
     {
-        public MessageProceeder(CommandsMiddleware commandsMiddleware, UserSender userSender, IConfiguration configuration, UserConverter userConverter)
+        private readonly NSFWCorrectorMiddleware correctorMiddleware;
+
+        public MessageProceeder(CommandsMiddleware commandsMiddleware, UserSender userSender, IConfiguration configuration, UserConverter userConverter, NSFWCorrectorMiddleware correctorMiddleware)
         {
             CommandsMiddleware = commandsMiddleware;
             UserSender = userSender;
             Configuration = configuration;
             UserConverter = userConverter;
+            this.correctorMiddleware = correctorMiddleware;
         }
 
         CommandsMiddleware CommandsMiddleware { get; }
@@ -61,6 +65,10 @@ namespace FavMultiSM.Api.Users
             }
             else
             {
+                if(message.Attachments!=null)
+                {
+                    message.Attachments = await correctorMiddleware.GetAttachmentsAsync(message.Attachments);
+                }
                 return await UserSender.SendToOthersMessage(message, user);
             }
         }       

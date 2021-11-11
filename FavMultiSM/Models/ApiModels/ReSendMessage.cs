@@ -8,6 +8,6 @@ namespace FavMultiSM.Models.ApiModels
     public class ReSendMessage
     {
         public string Text { get; set; }
-        public IEnumerable<string> Attachments { get; set; }
+        public IEnumerable<Attachment> Attachments { get; set; }
     }
 }

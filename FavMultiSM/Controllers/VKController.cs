@@ -36,12 +36,12 @@ namespace FavMultiSM.Controllers
                 var resendMsg = new ReSendMessage() { Text = msg.Text };
                 if (msg.Attachments != null)
                 {
-                    var convertedAttachments = new List<string>();
+                    var convertedAttachments = new List<Models.ApiModels.Attachment>();
                     foreach (var attach in msg.Attachments)
                     {                        
                         switch(attach.Instance)
                         {
-                            case Photo photo: convertedAttachments.Add(photo.PhotoSrc.ToString());  break;
+                            case Photo photo: convertedAttachments.Add(new Models.ApiModels.Attachment(photo.PhotoSrc.ToString()));  break;
                         }
                     }
                     resendMsg.Attachments = convertedAttachments;                   

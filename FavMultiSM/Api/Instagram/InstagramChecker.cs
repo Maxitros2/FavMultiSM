@@ -68,9 +68,9 @@ namespace FavMultiSM.Api.Instagram
                             case InstaDirectThreadItemType.Text:
                                 sendMessage = new Models.ApiModels.ReSendMessage() { Text = message.Text }; break;
                             case InstaDirectThreadItemType.Media:
-                                sendMessage = new Models.ApiModels.ReSendMessage() { Attachments = message.Media.Images.Where(x=>!Regex.Match(x.Uri, "[p,s][0-9]{1,}[x][0-9]{1,}").Success).Select(x => new StringBuilder(x.Uri).ToString()) }; break;
+                                sendMessage = new Models.ApiModels.ReSendMessage() { Attachments = message.Media.Images.Where(x=>!Regex.Match(x.Uri, "[p,s][0-9]{1,}[x][0-9]{1,}").Success).Select(x => new Attachment(new StringBuilder(x.Uri).ToString())) }; break;
                             case InstaDirectThreadItemType.MediaShare:
-                                sendMessage = new Models.ApiModels.ReSendMessage() { Attachments = message.MediaShare.Images.Select(x => new StringBuilder(x.Uri).ToString()) }; break;
+                                sendMessage = new Models.ApiModels.ReSendMessage() { Attachments = message.MediaShare.Images.Select(x => new Attachment(new StringBuilder(x.Uri).ToString())) }; break;
                         }
                         if (sendMessage != null)
                         {
