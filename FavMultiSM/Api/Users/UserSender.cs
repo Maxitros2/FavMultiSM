@@ -13,20 +13,18 @@ namespace FavMultiSM.Api.Users
 {
     public class UserSender : ITrancientService
     {
-        public UserSender(VKSender vKSender, TelegramSender telegramSender, InstagramSender instagramSender, AppDbContext context)
+        public UserSender(VKSender vKSender, TelegramSender telegramSender, InstagramSender instagramSender)
         {
             VKSender = vKSender;
             TelegramSender = telegramSender;
-            InstagramSender = instagramSender;
-            DbContext = context;
+            InstagramSender = instagramSender; 
             SenderDictionary = new Dictionary<SocialEnum, ISender>() { { SocialEnum.VK, VKSender }, { SocialEnum.Instagram, InstagramSender }, { SocialEnum.Telegram, TelegramSender } };
         }
 
         Dictionary<SocialEnum, ISender> SenderDictionary { get; }
         VKSender VKSender { get; }
         TelegramSender TelegramSender { get; }
-        InstagramSender InstagramSender { get; }
-        AppDbContext DbContext { get; }
+        InstagramSender InstagramSender { get; }        
         
         public async Task<bool> SendToOthersMessage(ReSendMessage message, UserAccountData data)
         {           
@@ -36,6 +34,11 @@ namespace FavMultiSM.Api.Users
                 {
                     await SenderDictionary[social].SendMessage(message, data);
                 }               
+            }
+            if(message.Attachments!=null)
+            {
+                foreach (var local in message.Attachments.Where(x => x.Type == AttachmentType.LocalPhoto))
+                    await Task.Run(()=> File.Delete(local.Url));
             }
             return true;
         }  

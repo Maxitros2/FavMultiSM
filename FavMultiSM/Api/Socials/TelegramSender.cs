@@ -35,8 +35,7 @@ namespace FavMultiSM.Api.Socials
                             using (var stream = System.IO.File.OpenRead(attach.Url))
                             {
                                 await bot.SendPhotoAsync(new ChatId(Convert.ToInt64(data.TelegtamId)), new InputOnlineFile(stream));                                
-                            }
-                            await Task.Run(() => System.IO.File.Delete(attach.Url));
+                            }                            
                             break;
                         case AttachmentType.WebPhoto:
                             await bot.SendPhotoAsync(new ChatId(Convert.ToInt64(data.TelegtamId)), new InputOnlineFile(attach.Url));
